@@ -14,11 +14,7 @@ function setVolume(volume) {
 
 function setupVolumeSlider() {
     const volumeSlider = document.getElementById("volume");
-    volumeSlider.type = "range";
-    volumeSlider.name = "volume";
-    volumeSlider.min = 0;
-    volumeSlider.max = 1;
-    volumeSlider.step = "any";
+    // volumeSlider.type = "range";
     volumeSlider.value = Math.pow(mainGainNode.gain.value / 0.125, 2);
     volumeSlider.oninput = (event) => setVolume(Math.sqrt(event.target.value) * 0.125);
 }
@@ -49,6 +45,7 @@ function togglePlayback(event, kind, targetAudioNode, destinationAudioNode) {
         targetAudioNode.disconnect(destinationAudioNode);
     }
 }
+
 
 async function loadSample(audioContext, url) {
     const result = await fetch(url);
