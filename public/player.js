@@ -61,7 +61,13 @@ function togglePlayback(event, kind, targetAudioNode, destinationAudioNode) {
 function updatePlaybackStateButton(buttonElement, kind) {
     buttonElement.replaceChildren(
         document.createTextNode(
-            playState[kind] ? `Mute ${playStateDisplayMap[kind]}` : `Unmute ${playStateDisplayMap[kind]}`,
+            kind === "main"
+                ? playState[kind]
+                    ? "Disconnect"
+                    : "Connect"
+                : playState[kind]
+                  ? `Mute ${playStateDisplayMap[kind]}`
+                  : `Unmute ${playStateDisplayMap[kind]}`,
         ),
     );
 }
