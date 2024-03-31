@@ -13,10 +13,7 @@ function setVolume(volume) {
 }
 
 function setupVolumeSlider() {
-    const volumeSliderContainer = document.createElement("div");
-    volumeSliderContainer.style.display = "flex";
-    volumeSliderContainer.style.gap = "0.5rem";
-    const volumeSlider = document.createElement("input");
+    const volumeSlider = document.getElementById("volume");
     volumeSlider.type = "range";
     volumeSlider.name = "volume";
     volumeSlider.min = 0;
@@ -24,46 +21,33 @@ function setupVolumeSlider() {
     volumeSlider.step = "any";
     volumeSlider.value = Math.pow(mainGainNode.gain.value / 0.125, 2);
     volumeSlider.oninput = (event) => setVolume(Math.sqrt(event.target.value) * 0.125);
-    const resetVolumeButton = document.createElement("button");
-    resetVolumeButton.onclick = () => {
-        volumeSlider.value = Math.pow(Math.pow(10, -20 / 20) / 0.125, 2);
-        setVolume(Math.sqrt(volumeSlider.value) * 0.125);
-    };
-    resetVolumeButton.appendChild(document.createTextNode("Reset"));
-    volumeSliderContainer.appendChild(document.createTextNode("Volume"));
-    volumeSliderContainer.appendChild(resetVolumeButton);
-    volumeSliderContainer.appendChild(volumeSlider);
-    document.body.appendChild(volumeSliderContainer);
 }
 
 function setupButton(kind, targetAudioNode, destinationAudioNode) {
-    const togglePlaybackButton = document.createElement("button");
-    togglePlaybackButton.onclick = (event) => togglePlayback(event, kind, targetAudioNode, destinationAudioNode);
-    updatePlaybackStateButton(togglePlaybackButton, kind);
-    document.body.appendChild(togglePlaybackButton);
+    const togglePlaybackButton = document.getElementById(kind);
+    togglePlaybackButton.addEventListener("click", () => {
+        togglePlayback(event, kind, targetAudioNode, destinationAudioNode)
+    });
 }
 
 function togglePlayback(event, kind, targetAudioNode, destinationAudioNode) {
     playState[kind] = !playState[kind];
     localStorage.setItem(kind, !!playState[kind]);
-    console.log(playState);
+    document.getElementById(kind).style.color = playState[kind] ? "var(--primary-control)" : "var(--disabled-control)";
     if (playState[kind]) {
         targetAudioNode.connect(destinationAudioNode);
         if (kind === "main") {
+            document.getElementById("play").style.display = "none";
+            document.getElementById("pause").style.display = "block";
             audioContext.resume();
         }
     } else {
+        if (kind === "main") {
+            document.getElementById("play").style.display = "block";
+            document.getElementById("pause").style.display = "none";
+        }
         targetAudioNode.disconnect(destinationAudioNode);
     }
-    updatePlaybackStateButton(event.srcElement, kind);
-}
-
-function updatePlaybackStateButton(buttonElement, kind) {
-    buttonElement.replaceChildren(
-        document.createTextNode(
-            playState[kind] ? `Mute ${playStateDisplayMap[kind]}` : `Unmute ${playStateDisplayMap[kind]}`,
-        ),
-    );
 }
 
 async function loadSample(audioContext, url) {
@@ -128,12 +112,19 @@ function chooseWhir() {
     whirSource.playbackRate.value = whirPlaybackRate;
     whirSource.connect(whirGainNode);
     whirSource.start(0);
+
+    if (playState.whir)
+        document.body.style.background = "var(--glowing-bg)"
+
     whirSource.onended = () => {
         // disconnect self and re-queue another whir
         whirSource.disconnect(whirGainNode);
         const nextWhirDelay = Math.floor(Math.random() * 2001);
         console.log("Next whir in", nextWhirDelay, "ms");
         setTimeout(chooseWhir, nextWhirDelay);
+        setTimeout(() => {
+            document.body.style.background = "var(--initial-bg)"
+        }, nextWhirDelay + 1000);
     };
 }
 
