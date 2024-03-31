@@ -14,8 +14,10 @@ function setVolume(volume) {
 
 function setupVolumeSlider() {
     const volumeSliderContainer = document.createElement("div");
-    volumeSliderContainer.style.display = "flex";
-    volumeSliderContainer.style.gap = "0.5rem";
+    const volumeLabel = document.createElement("label");
+    volumeLabel.style.display = "flex";
+    volumeLabel.style.gap = "0.5rem";
+    volumeLabel.appendChild(document.createTextNode("Volume"));
     const volumeSlider = document.createElement("input");
     volumeSlider.type = "range";
     volumeSlider.name = "volume";
@@ -30,9 +32,9 @@ function setupVolumeSlider() {
         setVolume(Math.sqrt(volumeSlider.value) * 0.125);
     };
     resetVolumeButton.appendChild(document.createTextNode("Reset"));
-    volumeSliderContainer.appendChild(document.createTextNode("Volume"));
+    volumeLabel.appendChild(volumeSlider);
+    volumeSliderContainer.appendChild(volumeLabel);
     volumeSliderContainer.appendChild(resetVolumeButton);
-    volumeSliderContainer.appendChild(volumeSlider);
     document.body.appendChild(volumeSliderContainer);
 }
 
