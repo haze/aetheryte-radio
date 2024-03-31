@@ -119,9 +119,7 @@ function chooseWhir() {
         const nextWhirDelay = Math.floor(Math.random() * 2001);
         console.log("Next whir in", nextWhirDelay, "ms");
         setTimeout(chooseWhir, nextWhirDelay);
-        setTimeout(() => {
-            document.body.style.background = "var(--initial-bg)"
-        }, nextWhirDelay + 1000);
+        document.body.style.background = "var(--initial-bg)";
     };
 }
 
