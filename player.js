@@ -51,15 +51,24 @@ mainGainNode.gain.value = Math.pow(10, -20 / 20);
 
 setupControls();
 
-const whirs = await Promise.all([
-    loadSample(audioContext, "assets/whir1.wav"),
-    loadSample(audioContext, "assets/whir2.wav"),
-    loadSample(audioContext, "assets/whir3.wav"),
-    loadSample(audioContext, "assets/whir4.wav"),
-    loadSample(audioContext, "assets/whir5.wav"),
-]);
+// https://stackoverflow.com/a/23522755
+const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
-function randomWhir() {}
+const whirs = isSafari
+    ? await Promise.all([
+          loadSample(audioContext, "assets/whir1.wav.opus.aac"),
+          loadSample(audioContext, "assets/whir2.wav.opus.aac"),
+          loadSample(audioContext, "assets/whir3.wav.opus.aac"),
+          loadSample(audioContext, "assets/whir4.wav.opus.aac"),
+          loadSample(audioContext, "assets/whir5.wav.opus.aac"),
+      ])
+    : await Promise.all([
+          loadSample(audioContext, "assets/whir1.wav.opus"),
+          loadSample(audioContext, "assets/whir2.wav.opus"),
+          loadSample(audioContext, "assets/whir3.wav.opus"),
+          loadSample(audioContext, "assets/whir4.wav.opus"),
+          loadSample(audioContext, "assets/whir5.wav.opus"),
+      ]);
 
 function chooseWhir() {
     const whirSource = audioContext.createBufferSource();
@@ -88,7 +97,7 @@ function chooseWhir() {
 }
 
 const humSource = audioContext.createBufferSource();
-humSource.buffer = await loadSample(audioContext, "assets/hum.wav");
+humSource.buffer = await loadSample(audioContext, isSafari ? "assets/hum.wav.opus.aac" : "assets/hum.wav.opus");
 humSource.playbackRate.value = 0.63;
 humSource.connect(humGainNode);
 humSource.loop = true;
