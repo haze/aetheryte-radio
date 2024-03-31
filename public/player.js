@@ -1,7 +1,39 @@
 function setupControls() {
+    // setup mute buttons
     setupButton("hum", humGainNode, mainGainNode);
     setupButton("whir", whirGainNode, mainGainNode);
     setupButton("main", mainGainNode, audioContext.destination);
+    // setup volume slider
+    setupVolumeSlider();
+}
+
+function setVolume(volume) {
+    localStorage.setItem("volume", volume);
+    mainGainNode.gain.value = volume;
+}
+
+function setupVolumeSlider() {
+    const volumeSliderContainer = document.createElement("div");
+    volumeSliderContainer.style.display = "flex";
+    volumeSliderContainer.style.gap = "0.5rem";
+    const volumeSlider = document.createElement("input");
+    volumeSlider.type = "range";
+    volumeSlider.name = "volume";
+    volumeSlider.min = 0;
+    volumeSlider.max = 1;
+    volumeSlider.step = "any";
+    volumeSlider.value = Math.pow(mainGainNode.gain.value / 0.125, 2);
+    volumeSlider.oninput = (event) => setVolume(Math.sqrt(event.target.value) * 0.125);
+    const resetVolumeButton = document.createElement("button");
+    resetVolumeButton.onclick = () => {
+        volumeSlider.value = Math.pow(Math.pow(10, -20 / 20) / 0.125, 2);
+        setVolume(Math.sqrt(volumeSlider.value) * 0.125);
+    };
+    resetVolumeButton.appendChild(document.createTextNode("Reset"));
+    volumeSliderContainer.appendChild(document.createTextNode("Volume"));
+    volumeSliderContainer.appendChild(resetVolumeButton);
+    volumeSliderContainer.appendChild(volumeSlider);
+    document.body.appendChild(volumeSliderContainer);
 }
 
 function setupButton(kind, targetAudioNode, destinationAudioNode) {
@@ -13,8 +45,13 @@ function setupButton(kind, targetAudioNode, destinationAudioNode) {
 
 function togglePlayback(event, kind, targetAudioNode, destinationAudioNode) {
     playState[kind] = !playState[kind];
+    localStorage.setItem(kind, !!playState[kind]);
+    console.log(playState);
     if (playState[kind]) {
         targetAudioNode.connect(destinationAudioNode);
+        if (kind === "main") {
+            audioContext.resume();
+        }
     } else {
         targetAudioNode.disconnect(destinationAudioNode);
     }
@@ -35,19 +72,23 @@ async function loadSample(audioContext, url) {
     return audioContext.decodeAudioData(arrayBuffer);
 }
 
-const playState = { hum: true, whir: true, main: true };
-const playStateDisplayMap = { hum: "Hums", whir: "Whirs", main: "both" };
+const playState = {
+    hum: localStorage.getItem("hum") === "true" ?? true,
+    whir: localStorage.getItem("whir") === "true" ?? true,
+    main: false,
+};
+const playStateDisplayMap = { hum: "Hums", whir: "Whirs", main: "output" };
+console.log(playState);
 const audioContext = new AudioContext();
 const humGainNode = audioContext.createGain();
 const whirGainNode = audioContext.createGain();
 const mainGainNode = audioContext.createGain();
 
-humGainNode.connect(mainGainNode);
-whirGainNode.connect(mainGainNode);
-mainGainNode.connect(audioContext.destination);
+if (playState.hum) humGainNode.connect(mainGainNode);
+if (playState.whir) whirGainNode.connect(mainGainNode);
 
 // remove 25db
-mainGainNode.gain.value = Math.pow(10, -20 / 20);
+mainGainNode.gain.value = localStorage.getItem("volume") ?? Math.pow(10, -20 / 20);
 
 setupControls();
 
