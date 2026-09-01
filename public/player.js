@@ -105,18 +105,18 @@ const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
 const whirs = isSafari
     ? await Promise.all([
-          loadSample(audioContext, "assets/whir1.wav.opus.aac"),
-          loadSample(audioContext, "assets/whir2.wav.opus.aac"),
-          loadSample(audioContext, "assets/whir3.wav.opus.aac"),
-          loadSample(audioContext, "assets/whir4.wav.opus.aac"),
-          loadSample(audioContext, "assets/whir5.wav.opus.aac"),
+          loadSample(audioContext, "assets/whir1.aac"),
+          loadSample(audioContext, "assets/whir2.aac"),
+          loadSample(audioContext, "assets/whir3.aac"),
+          loadSample(audioContext, "assets/whir4.aac"),
+          loadSample(audioContext, "assets/whir5.aac"),
       ])
     : await Promise.all([
-          loadSample(audioContext, "assets/whir1.wav.opus"),
-          loadSample(audioContext, "assets/whir2.wav.opus"),
-          loadSample(audioContext, "assets/whir3.wav.opus"),
-          loadSample(audioContext, "assets/whir4.wav.opus"),
-          loadSample(audioContext, "assets/whir5.wav.opus"),
+          loadSample(audioContext, "assets/whir1.opus"),
+          loadSample(audioContext, "assets/whir2.opus"),
+          loadSample(audioContext, "assets/whir3.opus"),
+          loadSample(audioContext, "assets/whir4.opus"),
+          loadSample(audioContext, "assets/whir5.opus"),
       ]);
 
 function chooseWhir() {
@@ -146,7 +146,7 @@ function chooseWhir() {
 }
 
 const humSource = audioContext.createBufferSource();
-humSource.buffer = await loadSample(audioContext, isSafari ? "assets/hum.wav.opus.aac" : "assets/hum.wav.opus");
+humSource.buffer = await loadSample(audioContext, isSafari ? "assets/hum.aac" : "assets/hum.opus");
 humSource.playbackRate.value = 0.63;
 humSource.connect(humGainNode);
 humSource.loop = true;
